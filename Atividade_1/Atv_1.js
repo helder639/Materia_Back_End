@@ -10,38 +10,92 @@ const usuarios = [
 
 usuarios.forEach(usuario =>{
     let total = 0;
-    for(let n of usuario.compras){
+    for (let n of usuario.compras){
         total += n;
     }
     usuario.total = total;
     console.log(`${usuario.nome}: total = ${total}`);
 });
 
-//ativos
-
-usuarios.forEach(usuario =>{
-    if(usuario.ativo === true){
-        console.log(`${usuario.nome}`);
+const usuariosAtivos = usuarios.map(usuario =>{
+    if(usuario.ativo ===true){
+        console.log(`${usuario.nome}`)
     }
-})
+});
 
-//maiores de idade
-
-usuarios.forEach(usuario => {
+const maioresDeIdade = usuarios.map(usuario => {
     if(usuario.idade >= 18){
-        console.log(`${usuario.nome}`);
+        console.log(`${usuario.nome}`)
     }
-})
+});
 
-let maior = 0;
-let usuarioMaior;
-for(let n of usuarios){
-    if(n.total > maior){
-        maior = n.total;
-        usuarioMaior = n;
+const maiorCompra = (lista) => {
+    let maior = 0;
+    let usuMaior = "";
+    for(let n of lista){
+        if(n.total > maior){
+            maior = n.total 
+            usuMaior = n.nome
+        }
+    }
+    console.log(`Usuário com maior volume: ${usuMaior} \n Total: ${maior}`);
+}
+
+maiorCompra(usuarios);
+
+const gerarRelatorio = (lista) => {
+
+    const totalUsuarios = lista.length;
+    const usuariosAtivos = lista.filter(usuario => usuario.ativo === true).length;
+    const mediaIdade = (lista) => {
+        let somaIdade = 0;
+        let media = 0;
+        for(let n of lista){
+            somaIdade += n.idade;
+        }
+        media = somaIdade / lista.length;
+        return media;   
+    }
+
+    const maiorComprador = (lista) => {
+        let maior = 0;
+        let usuarioMaior ="";
+        for(let n of lista){
+            if(n.total > maior){
+                maior = n.total;
+                usuarioMaior = n.nome;
+            }
+        }
+        return usuarioMaior;
+    }
+
+    let relatiorio = {
+        totalUsuarios,
+        usuariosAtivos,
+        mediaIdade: mediaIdade(lista),
+        maiorComprador: maiorComprador(lista)
+    }
+    return relatiorio;
+}
+
+console.log(gerarRelatorio(usuarios));
+
+ 
+const mediaCompras = (lista) => {
+    for (let n of lista) {
+        if (n.compras.length === 0) {
+            console.log(`Média de compras de ${n.nome}: 0`);
+            continue;
+        }
+        let somaCompras = n.total;
+        let media = somaCompras / n.compras.length;
+        
+        console.log(`Média de compras de ${n.nome}: ${media}`);
     }
 };
-console.log(`Usuário com maior volume: ${usuarioMaior.nome} \n Total: ${maior}`);
+
+mediaCompras(usuarios);
+
 /*
 DESAFIO 05
 R: 1 - "52" O operador + com uma string faz concatenação (junta os valores), transformando o 2 em texto.
@@ -75,70 +129,3 @@ pessoa2.falar();
 2 - O segundo código não funciona, pois a função arrow não tem o seu próprio this, então ele vai buscar o this no escopo global, que não tem a propriedade nome.
 3 - Ela não cria seu próprio contexto de this. Portanto, quando usada dentro de um objeto literal, o this não aponta para o objeto, mas sim para o escopo global (ou módulo) que envolve o objeto.
 */
-
-//Desafio 7
-
-const gerarRelatorio = (u) => {
-    const totalUsuarios = u.length;
-    const usuariosAtivos = u.filter(usuario => usuario.ativo).length;
-    const usuariosInat = totalUsuarios - usuariosAtivos;
-    const somaIdade = u.reduce((soma, usuario) => soma + usuario.idade, 0);
-    const mediaIdade = somaIdade / totalUsuarios;
-    let maiorVol = -1;
-    let maiorComprador = "";
-    
-    u.forEach(usuario => {
-        const totalCompras = usuario.compras.reduce((acc, valor) => acc + valor, 0);
-        if(totalCompras > maiorVol) {
-            maiorVol = totalCompras;
-            maiorComprador = usuario.nome;
-        }
-    });
-    return {
-        totalUsuarios,
-        usuariosAtivos,
-        usuariosInat,
-        mediaIdade,
-        maiorComprador
-    };
-};
-
-const relatorio = gerarRelatorio(usuarios);
-console.log(relatorio);
-
-const usuJov = (u) => {
-    let menor = Infinity;
-    let usuJovem = "";
-    u.forEach(usuario =>{
-        if(usuario.idade < menor){
-            menor = usuario.idade;
-            usuJovem = usuario.nome;
-        }
-    })
-    return usuJovem;
-};
-
-console.log(`Usuário mais jovem: ${usuJov(usuarios)}`);
-
-const usuVel = (u) => {
-    let velho = -1;
-    let usuVe = "";
-    u.forEach(usuario => {
-        if(usuario.idade > velho){
-            velho = usuario.idade;
-            usuVe = usuario.nome;
-        }
-    });
-    return usuVe;
-}
-console.log(`Usuário mais velho: ${usuVel(usuarios)}`); 
-
-const mediaCompras = (u) => {
-    u.forEach(usuario =>{
-        let soma = usuario.compras.reduce((acc, valorrr) => acc + valorrr, 0);
-        let media = usuario.compras.length > 0 ? soma / usuario.compras.length : 0;
-        console.log(`Média de compras de ${usuario.nome}: ${media}`);
-    });
-}
-
-console.log(mediaCompras(usuarios));
