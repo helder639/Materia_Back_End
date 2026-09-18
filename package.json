@@ -1,0 +1,12 @@
+{
+  "name": "meu-projeto-node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Helder de Lima Dantas Neto",
+  "license": "ISC",
+  "description": ""
+}
