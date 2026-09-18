@@ -1,0 +1,14 @@
+[
+    {
+      "id": 1,
+      "nome": "Mercedes Classe S",
+      "marca": "Mercedes-Benz",
+      "ano": 2022
+    },
+    {
+      "id": 2,
+      "nome": "BMW Série 7",
+      "marca": "BMW",
+      "ano": 2023
+    }
+  ]

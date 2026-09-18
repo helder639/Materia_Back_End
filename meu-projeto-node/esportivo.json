@@ -1,0 +1,14 @@
+[
+    {
+      "id": 1,
+      "nome": "Ferrari F40",
+      "marca": "Ferrari",
+      "ano": 1987
+    },
+    {
+      "id": 2,
+      "nome": "Porsche 911",
+      "marca": "Porsche",
+      "ano": 2020
+    }
+  ]
