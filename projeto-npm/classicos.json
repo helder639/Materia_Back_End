@@ -1,0 +1,14 @@
+[
+    {
+      "id": 1,
+      "nome": "Fusca",
+      "marca": "Volkswagen",
+      "ano": 1972
+    },
+    {
+      "id": 2,
+      "nome": "Opala",
+      "marca": "Chevrolet",
+      "ano": 1978
+    }
+  ]
