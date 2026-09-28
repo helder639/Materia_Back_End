@@ -1,12 +1,20 @@
 {
   "name": "meu-projeto-node",
   "version": "1.0.0",
+  "description": "Atividade Dojo2",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node operacoes.js",
+    "dev": "nodemon operacoes.js"
   },
   "keywords": [],
   "author": "Helder de Lima Dantas Neto",
   "license": "ISC",
-  "description": ""
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
