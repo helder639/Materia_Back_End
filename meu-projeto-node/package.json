@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node operacoes.js",
-    "dev": "nodemon operacoes.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "Helder de Lima Dantas Neto",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "lodash": "^4.18.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

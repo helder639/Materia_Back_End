@@ -1,19 +1,17 @@
 const express = require('express');
 
+const router = express.Router();
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get('/', (req,res)=>{
+router.get('/', (req,res)=>{
     res.send('Página inicial');
 })
 
-app.get('/adicao', (req,res)=>{
+router.get('/adicao', (req,res)=>{
     res.send('Você está na rota adição');
 })
 //ADIÇÃO DOS DOIS JEITOS
-app.get('/adicao/:a/:b', (req,res)=>{
+router.get('/adicao/:a/:b', (req,res)=>{
     const a = req.params.a;
     const b = req.params.b;
 
@@ -23,7 +21,7 @@ app.get('/adicao/:a/:b', (req,res)=>{
 
 })
 
-app.post('/adicao', (req,res)=>{
+router.post('/adicao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
     res.json({
@@ -32,11 +30,11 @@ app.post('/adicao', (req,res)=>{
 })
 
 //SUBTRAÇÃO
-app.get('/subtracao', (req,res)=>{
+router.get('/subtracao', (req,res)=>{
     res.send('Você está na rota subtração');
 })
 
-app.post('/subtracao', (req,res)=>{
+router.post('/subtracao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
     res.json({
@@ -45,11 +43,11 @@ app.post('/subtracao', (req,res)=>{
 })
 
 //MULTIPLICAÇÃO
-app.get('/multiplicacao', (req,res)=>{
+router.get('/multiplicacao', (req,res)=>{
     res.send('Você está na rota multiplicação');
 })
 
-app.post('/multiplicacao', (req,res)=>{
+router.post('/multiplicacao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
     res.json({
@@ -58,19 +56,24 @@ app.post('/multiplicacao', (req,res)=>{
 })
 
 //DIVISÃO
-app.get('/divisao', (req,res)=>{
+router.get('/divisao', (req,res)=>{
     res.send('Você está na rota divisão');
 })
 
-app.post('/divisao', (req,res)=>{
+router.post('/divisao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
+
+    if (parseInt(b) === 0){
+        return res.json({ resultado: 'ERRO: Divisão por zero'});
+    }
     res.json({
         resultado: parseInt(a) / parseInt(b)
     })
 })
 
-app.listen(3000, () => {
+/*app.listen(3000, () => {
   console.log('Servidor Express executando http://localhost:3000');
-});
+});*/
 
+module.exports = router;
