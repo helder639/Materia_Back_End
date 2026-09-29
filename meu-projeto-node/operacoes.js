@@ -34,6 +34,16 @@ router.get('/subtracao', (req,res)=>{
     res.send('Você está na rota subtração');
 })
 
+router.get('/subtracao/:a/:b', (req,res)=>{
+    const a = req.params.a;
+    const b = req.params.b;
+
+    res.json({
+        resultado: parseInt(a) - parseInt(b)
+    })
+
+})
+
 router.post('/subtracao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
@@ -47,6 +57,16 @@ router.get('/multiplicacao', (req,res)=>{
     res.send('Você está na rota multiplicação');
 })
 
+router.get('/multiplicacao/:a/:b', (req,res)=>{
+    const a = req.params.a;
+    const b = req.params.b;
+
+    res.json({
+        resultado: parseInt(a) * parseInt(b)
+    })
+
+})
+
 router.post('/multiplicacao', (req,res)=>{
     const a = req.body.a;
     const b = req.body.b;
@@ -58,6 +78,16 @@ router.post('/multiplicacao', (req,res)=>{
 //DIVISÃO
 router.get('/divisao', (req,res)=>{
     res.send('Você está na rota divisão');
+})
+
+router.get('/divisao/:a/:b', (req,res)=>{
+    const a = req.params.a;
+    const b = req.params.b;
+
+    res.json({
+        resultado: parseInt(a) / parseInt(b)
+    })
+
 })
 
 router.post('/divisao', (req,res)=>{
