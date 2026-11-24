@@ -1,15 +1,22 @@
 require('dotenv').config();
+
 const express = require('express');
+
 require('./database/connection');
+
 const protegerRota = require('./middleware/auth');
 
 const app = express();
+
 app.use(express.json());
 
 app.use('/auth', require('./rotas/auth'));
 
 app.use('/categorias', protegerRota, require('./rotas/categorias'));
+
 app.use('/fontes-destinos', protegerRota, require('./rotas/fontesDestinos'));
+app.use('/lancamentos', protegerRota, require('./rotas/lancamentos'));
+app.use('/relatorios', protegerRota, require('./rotas/relatorios'));
 
 app.use((req, res) => res.status(404).json({ erro: 'Rota não encontrada.' }));
 
