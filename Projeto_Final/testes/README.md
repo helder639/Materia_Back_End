@@ -23,4 +23,3 @@ O servidor usa a porta 3000 por padrão. Cadastro/login estão em `/auth`; todas
 - `/lancamentos`: operações de entrada/saída, filtros, paginação e parcelamento até 48 vezes.
 - `/relatorios`: análises por categoria, fonte/destino, faturas previstas e saúde financeira.
 
-Exemplos completos em `testes/requisicoes.md`. O projeto não possui suíte automatizada configurada ainda.
