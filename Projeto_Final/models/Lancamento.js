@@ -1,15 +1,24 @@
 const crypto = require('crypto');
 
 function avancarMes(data, meses) {
+
   const [ano, mes, dia] = data.split('-').map(Number);
+
   const base = new Date(ano, mes - 1 + meses, 1);
+
   const ultimoDia = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
-  return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(Math.min(dia, ultimoDia)).padStart(2, '0')}`;
+
+  return `${base.getFullYear()}-${String(base.getMonth() + 1)
+  .padStart(2, '0')}-${String(Math.min(dia, ultimoDia)).padStart(2, '0')}`;
+  
 }
+
 const connection = require('../database/connection');
 
 class Lancamento {
+
   listar(usuarioId, filtros, callback) {
+
     const {
       inicio,
       fim,
@@ -27,18 +36,22 @@ class Lancamento {
       where += ' AND l.data >= ?';
       params.push(inicio);
     }
+
     if (fim) {
       where += ' AND l.data <= ?';
       params.push(fim);
     }
+
     if (tipo) {
       where += ' AND l.tipo = ?';
       params.push(tipo);
     }
+
     if (categoriaId) {
       where += ' AND l.categoria_id = ?';
       params.push(categoriaId);
     }
+
     if (fonteDestinoId) {
       where += ' AND l.fonte_destino_id = ?';
       params.push(fonteDestinoId);
@@ -54,12 +67,17 @@ class Lancamento {
     `;
 
     connection.query(sqlResumo, params, (erro, resultadoResumo) => {
+
       if (erro) return callback(erro);
 
       const resumoRow = resultadoResumo[0];
+
       const totalItens = Number(resumoRow.totalItens);
+
       const entradas = Number(resumoRow.entradas);
+
       const saidas = Number(resumoRow.saidas);
+
       const offset = (pagina - 1) * limite;
 
       const sqlItens = `
@@ -124,7 +142,9 @@ class Lancamento {
   }
 
   inserir(usuarioId, { tipo, descricao, valoresParcelas, data, categoriaId, fonteDestinoId }, callback) {
+
     const totalParcelas = valoresParcelas.length;
+
     const grupoParcelamento = totalParcelas > 1 ? crypto.randomUUID() : null;
 
     const linhas = valoresParcelas.map((valorParcela, index) => [
@@ -141,6 +161,7 @@ class Lancamento {
     ]);
 
     connection.beginTransaction((erro) => {
+
       if (erro) return callback(erro);
 
       const sql = `
@@ -159,6 +180,7 @@ class Lancamento {
       `;
 
       connection.query(sql, [linhas], (erro, resultado) => {
+
         if (erro) return connection.rollback(() => callback(erro));
 
         connection.commit((erro) => {
@@ -174,36 +196,50 @@ class Lancamento {
   }
 
   atualizar(id, usuarioId, { tipo, descricao, valor, data, categoriaId, fonteDestinoId }, callback) {
+
     const sql = `
       UPDATE lancamentos
       SET tipo = ?, descricao = ?, valor = ?, data = ?, categoria_id = ?, fonte_destino_id = ?
       WHERE id = ? AND usuario_id = ?
     `;
+
     const params = [tipo, descricao, valor, data, categoriaId, fonteDestinoId, id, usuarioId];
     connection.query(sql, params, callback);
+
   }
 
   remover(id, usuarioId, todasParcelas, callback) {
+
     if (!todasParcelas) {
+
       const sql = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
       return connection.query(sql, [id, usuarioId], callback);
+
     }
 
     const sqlBusca = 'SELECT grupo_parcelamento FROM lancamentos WHERE id = ? AND usuario_id = ?';
     connection.query(sqlBusca, [id, usuarioId], (erro, resultados) => {
+      
       if (erro) return callback(erro);
+
       if (resultados.length === 0) {
+
         return callback(null, { affectedRows: 0 });
+
       }
 
       const { grupo_parcelamento: grupo } = resultados[0];
+
       if (!grupo) {
+
         const sqlUnico = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
         return connection.query(sqlUnico, [id, usuarioId], callback);
+
       }
 
       const sqlGrupo = 'DELETE FROM lancamentos WHERE grupo_parcelamento = ? AND usuario_id = ?';
       connection.query(sqlGrupo, [grupo, usuarioId], callback);
+      
     });
   }
 }
