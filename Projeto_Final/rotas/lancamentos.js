@@ -41,6 +41,7 @@ function validar(body, parcial = false) {
 }
 
 function validarRelacionamentos(usuarioId, dados, callback) {
+<<<<<<< HEAD
 
   const validarCategoria = (proximo) => {
 
@@ -79,12 +80,34 @@ function validarRelacionamentos(usuarioId, dados, callback) {
       if (tipoLancamento === 'entrada' && rows[0].tipo === 'cartao_credito')
          return callback({ status: 400, campo: 'fonteDestinoId',
          mensagem: 'Entradas não podem ser vinculadas a cartão de crédito.' });
+=======
+  const validarCategoria = (proximo) => {
+    if (!dados.categoriaId) return proximo(null);
+    Categoria.buscarPorId(dados.categoriaId, usuarioId, (erro, rows) => {
+      if (erro) return proximo(erro);
+      if (!rows.length) return proximo({ status: 400, campo: 'categoriaId', mensagem: 'Categoria não encontrada para este usuário.' });
+      const tipo = dados.tipo;
+      if (tipo && rows[0].tipo !== tipo) return proximo({ status: 400, campo: 'categoriaId', mensagem: 'O tipo da categoria deve ser igual ao tipo do lançamento.' });
+      dados._categoriaTipo = rows[0].tipo;
+      proximo(null);
+    });
+  };
+  validarCategoria((erro) => {
+    if (erro) return callback(erro);
+    if (!dados.fonteDestinoId) return callback(null);
+    FonteDestino.buscarPorId(dados.fonteDestinoId, usuarioId, (err, rows) => {
+      if (err) return callback(err);
+      if (!rows.length) return callback({ status: 400, campo: 'fonteDestinoId', mensagem: 'Fonte/destino não encontrada para este usuário.' });
+      const tipoLancamento = dados.tipo || dados._categoriaTipo;
+      if (tipoLancamento === 'entrada' && rows[0].tipo === 'cartao_credito') return callback({ status: 400, campo: 'fonteDestinoId', mensagem: 'Entradas não podem ser vinculadas a cartão de crédito.' });
+>>>>>>> main
       callback(null);
     });
   });
 }
 
 router.get('/', (req, res) => {
+<<<<<<< HEAD
 
   const { inicio, fim, tipo, categoriaId, fonteDestinoId } = req.query;
 
@@ -119,10 +142,27 @@ router.get('/:id', (req, res) => Lancamento.buscarPorId(req.params.id, req.auth.
   if (!rows.length) return res.status(404)
     .json({ erro: 'Lançamento não encontrado.' });
 
+=======
+  const { inicio, fim, tipo, categoriaId, fonteDestinoId } = req.query;
+  if ((inicio && !dataValida(inicio)) || (fim && !dataValida(fim)) || (inicio && fim && inicio > fim)) return res.status(400).json({ erro: 'Período inválido. Use inicio e fim no formato AAAA-MM-DD.' });
+  if (tipo && !TIPOS.includes(tipo)) return res.status(400).json({ erro: 'tipo deve ser entrada ou saida.' });
+  const pagina = Number(req.query.pagina || 1);
+  if (!Number.isInteger(pagina) || pagina < 1) return res.status(400).json({ erro: 'pagina deve ser um inteiro positivo.' });
+  Lancamento.listar(req.auth.id, { inicio, fim, tipo, categoriaId, fonteDestinoId, pagina, limite: 20 }, (erro, resultado) => {
+    if (erro) { console.error(erro); return res.status(500).json({ erro: 'Erro ao listar lançamentos.' }); }
+    res.json({ pagina, porPagina: 20, ...resultado });
+  });
+});
+
+router.get('/:id', (req, res) => Lancamento.buscarPorId(req.params.id, req.auth.id, (erro, rows) => {
+  if (erro) { console.error(erro); return res.status(500).json({ erro: 'Erro ao buscar lançamento.' }); }
+  if (!rows.length) return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+>>>>>>> main
   res.json(rows[0]);
 }));
 
 router.post('/', (req, res) => {
+<<<<<<< HEAD
 
   const { erros, dados } = validar(req.body);
 
@@ -145,11 +185,22 @@ router.post('/', (req, res) => {
 
       res.status(201).json(resultado);
 
+=======
+  const { erros, dados } = validar(req.body);
+  if (Object.keys(erros).length) return res.status(400).json({ erro: 'Dados inválidos.', campos: erros });
+  validarRelacionamentos(req.auth.id, dados, (erro) => {
+    if (erro) { if (erro.status) return res.status(erro.status).json({ erro: erro.mensagem, campos: { [erro.campo]: erro.mensagem } }); console.error(erro); return res.status(500).json({ erro: 'Erro ao validar lançamento.' }); }
+    const valores = dividirEmParcelas(dados.valor, dados.parcelas || 1);
+    Lancamento.inserir(req.auth.id, { ...dados, valoresParcelas: valores }, (err, resultado) => {
+      if (err) { console.error(err); return res.status(500).json({ erro: 'Erro ao criar lançamento.' }); }
+      res.status(201).json(resultado);
+>>>>>>> main
     });
   });
 });
 
 router.put('/:id', (req, res) => {
+<<<<<<< HEAD
 
   const { erros, dados } = validar(req.body, true);
 
@@ -191,12 +242,29 @@ router.put('/:id', (req, res) => {
 
         res.json({ id: Number(req.params.id), ...atualizado });
 
+=======
+  const { erros, dados } = validar(req.body, true);
+  if (Object.keys(erros).length) return res.status(400).json({ erro: 'Dados inválidos.', campos: erros });
+  Lancamento.buscarPorId(req.params.id, req.auth.id, (erro, rows) => {
+    if (erro) { console.error(erro); return res.status(500).json({ erro: 'Erro ao buscar lançamento.' }); }
+    if (!rows.length) return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+    const antigo = rows[0];
+    const combinado = { tipo: dados.tipo || antigo.tipo, categoriaId: dados.categoriaId || antigo.categoria_id, fonteDestinoId: dados.fonteDestinoId || antigo.fonte_destino_id };
+    validarRelacionamentos(req.auth.id, combinado, (err) => {
+      if (err) { if (err.status) return res.status(err.status).json({ erro: err.mensagem, campos: { [err.campo]: err.mensagem } }); console.error(err); return res.status(500).json({ erro: 'Erro ao validar lançamento.' }); }
+      const atualizado = { tipo: combinado.tipo, descricao: dados.descricao || antigo.descricao, valor: dados.valor || Number(antigo.valor), data: dados.data || antigo.data, categoriaId: combinado.categoriaId, fonteDestinoId: combinado.fonteDestinoId };
+      Lancamento.atualizar(req.params.id, req.auth.id, atualizado, (e, resultado) => {
+        if (e) { console.error(e); return res.status(500).json({ erro: 'Erro ao atualizar lançamento.' }); }
+        if (!resultado.affectedRows) return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+        res.json({ id: Number(req.params.id), ...atualizado });
+>>>>>>> main
       });
     });
   });
 });
 
 router.delete('/:id', (req, res) => {
+<<<<<<< HEAD
 
   if (req.query.todasParcelas !== undefined && !['true', 'false']
     .includes(req.query.todasParcelas)) return res.status(400)
@@ -213,6 +281,13 @@ router.delete('/:id', (req, res) => {
 
     res.status(204).send();
     
+=======
+  if (req.query.todasParcelas !== undefined && !['true', 'false'].includes(req.query.todasParcelas)) return res.status(400).json({ erro: 'todasParcelas deve ser true ou false.' });
+  Lancamento.remover(req.params.id, req.auth.id, req.query.todasParcelas === 'true', (erro, resultado) => {
+    if (erro) { console.error(erro); return res.status(500).json({ erro: 'Erro ao excluir lançamento.' }); }
+    if (!resultado.affectedRows) return res.status(404).json({ erro: 'Lançamento não encontrado.' });
+    res.status(204).send();
+>>>>>>> main
   });
 });
 module.exports = router;

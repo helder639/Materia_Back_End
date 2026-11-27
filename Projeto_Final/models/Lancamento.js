@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
 function avancarMes(data, meses) {
+<<<<<<< HEAD
 
   const [ano, mes, dia] = data.split('-').map(Number);
 
@@ -19,6 +20,17 @@ class Lancamento {
 
   listar(usuarioId, filtros, callback) {
 
+=======
+  const [ano, mes, dia] = data.split('-').map(Number);
+  const base = new Date(ano, mes - 1 + meses, 1);
+  const ultimoDia = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+  return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(Math.min(dia, ultimoDia)).padStart(2, '0')}`;
+}
+const connection = require('../database/connection');
+
+class Lancamento {
+  listar(usuarioId, filtros, callback) {
+>>>>>>> main
     const {
       inicio,
       fim,
@@ -36,22 +48,34 @@ class Lancamento {
       where += ' AND l.data >= ?';
       params.push(inicio);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     if (fim) {
       where += ' AND l.data <= ?';
       params.push(fim);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     if (tipo) {
       where += ' AND l.tipo = ?';
       params.push(tipo);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     if (categoriaId) {
       where += ' AND l.categoria_id = ?';
       params.push(categoriaId);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     if (fonteDestinoId) {
       where += ' AND l.fonte_destino_id = ?';
       params.push(fonteDestinoId);
@@ -67,6 +91,7 @@ class Lancamento {
     `;
 
     connection.query(sqlResumo, params, (erro, resultadoResumo) => {
+<<<<<<< HEAD
 
       if (erro) return callback(erro);
 
@@ -78,6 +103,14 @@ class Lancamento {
 
       const saidas = Number(resumoRow.saidas);
 
+=======
+      if (erro) return callback(erro);
+
+      const resumoRow = resultadoResumo[0];
+      const totalItens = Number(resumoRow.totalItens);
+      const entradas = Number(resumoRow.entradas);
+      const saidas = Number(resumoRow.saidas);
+>>>>>>> main
       const offset = (pagina - 1) * limite;
 
       const sqlItens = `
@@ -142,9 +175,13 @@ class Lancamento {
   }
 
   inserir(usuarioId, { tipo, descricao, valoresParcelas, data, categoriaId, fonteDestinoId }, callback) {
+<<<<<<< HEAD
 
     const totalParcelas = valoresParcelas.length;
 
+=======
+    const totalParcelas = valoresParcelas.length;
+>>>>>>> main
     const grupoParcelamento = totalParcelas > 1 ? crypto.randomUUID() : null;
 
     const linhas = valoresParcelas.map((valorParcela, index) => [
@@ -161,7 +198,10 @@ class Lancamento {
     ]);
 
     connection.beginTransaction((erro) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
       if (erro) return callback(erro);
 
       const sql = `
@@ -180,7 +220,10 @@ class Lancamento {
       `;
 
       connection.query(sql, [linhas], (erro, resultado) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
         if (erro) return connection.rollback(() => callback(erro));
 
         connection.commit((erro) => {
@@ -196,12 +239,16 @@ class Lancamento {
   }
 
   atualizar(id, usuarioId, { tipo, descricao, valor, data, categoriaId, fonteDestinoId }, callback) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     const sql = `
       UPDATE lancamentos
       SET tipo = ?, descricao = ?, valor = ?, data = ?, categoria_id = ?, fonte_destino_id = ?
       WHERE id = ? AND usuario_id = ?
     `;
+<<<<<<< HEAD
 
     const params = [tipo, descricao, valor, data, categoriaId, fonteDestinoId, id, usuarioId];
     connection.query(sql, params, callback);
@@ -215,10 +262,21 @@ class Lancamento {
       const sql = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
       return connection.query(sql, [id, usuarioId], callback);
 
+=======
+    const params = [tipo, descricao, valor, data, categoriaId, fonteDestinoId, id, usuarioId];
+    connection.query(sql, params, callback);
+  }
+
+  remover(id, usuarioId, todasParcelas, callback) {
+    if (!todasParcelas) {
+      const sql = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
+      return connection.query(sql, [id, usuarioId], callback);
+>>>>>>> main
     }
 
     const sqlBusca = 'SELECT grupo_parcelamento FROM lancamentos WHERE id = ? AND usuario_id = ?';
     connection.query(sqlBusca, [id, usuarioId], (erro, resultados) => {
+<<<<<<< HEAD
       
       if (erro) return callback(erro);
 
@@ -235,11 +293,25 @@ class Lancamento {
         const sqlUnico = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
         return connection.query(sqlUnico, [id, usuarioId], callback);
 
+=======
+      if (erro) return callback(erro);
+      if (resultados.length === 0) {
+        return callback(null, { affectedRows: 0 });
+      }
+
+      const { grupo_parcelamento: grupo } = resultados[0];
+      if (!grupo) {
+        const sqlUnico = 'DELETE FROM lancamentos WHERE id = ? AND usuario_id = ?';
+        return connection.query(sqlUnico, [id, usuarioId], callback);
+>>>>>>> main
       }
 
       const sqlGrupo = 'DELETE FROM lancamentos WHERE grupo_parcelamento = ? AND usuario_id = ?';
       connection.query(sqlGrupo, [grupo, usuarioId], callback);
+<<<<<<< HEAD
       
+=======
+>>>>>>> main
     });
   }
 }
